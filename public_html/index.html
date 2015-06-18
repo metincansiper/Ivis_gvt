@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+    <title>Ivis-Assignment</title>
+    <link rel="stylesheet" href="libs/css/bootstrap.min.css">
+        <link rel="stylesheet" href="libs/css/bootstrap-theme.min.css">
+            <link rel="stylesheet" href="libs/css/jquery-ui-1.10.3.custom.css">
+                <script src="libs/js/jquery-1.8.2.min.js"></script>
+                <script src="libs/js/jquery-ui-1.10.3.custom.min.js"></script>
+                <script src="libs/js/cytoscape.min.js"></script>
+                <script src="libs/js/bootstrap.min.js"></script>
+                <script src="libs/js/springy.js"></script>
+                <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
+                <script src="libs/js/layout.arbor.js"></script>
+                <script src="libs/js/FileSaver.js"></script>
+                <script src="js/Globals.js"></script>
+                <script src="js/IDGenerator.js"></script>
+                <script src="js/graphml-to-json-converter.js"></script>
+                <script src="js/json-to-graphml-converter.js"></script>
+                <script src="js/sample-app-menu-functions.js"></script>
+                <style type="text/css">
+                    .menu-container{
+                        border: 1px solid #ddd;
+                        border-radius: 0.25em;
+                        margin: auto;
+                        height: 40px;
+                        width: 1000px;
+                    }
+                    #sbgn-network-container {
+                        margin: auto;
+                        border: 1px solid #ddd;
+                        height: 680px;
+                        width: 1000px;
+                        overflow: auto !important;
+                        border-radius: 0.25em;
+                    }
+                    #break {
+                        margin: auto;
+                        height: 40px;
+                        width: 1000px;
+                    }
+                    .selected {
+                    }
+                </style>
+                </head>
+                <body>
+                <div class="menu-container">
+                    <nav id="myNavbar" class="navbar navbar-default" role="navigation">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <div class="container">
+                            <!-- Collect the nav links, forms, and other content for toggling -->
+                            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">File <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" type="file" id="load-file">Load...</a></li>
+                                            <input id="file-input" type="file" style="display:none" />
+                                            <li><a href="#" id="save">Save</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Edit <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" id="add-node">Add Node</a></li>
+                                            <li><a href="#" id="delete-node">Delete Node</a></li>
+                                            <li class="divider"></li>
+                                            <li><a href="#" id='create-compound'>Create Compound</a></li>
+                                            <li class="divider"></li>
+                                            <li><a href="#" id='add-edge'>Add Edge</a></li>
+                                            <li><a href="#" id='delete-edge'>Delete Edge</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Layout <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" id="perform-layout">Perform Layout</a></li>
+                                            <li><a href="#" id="layout-properties">Layout Properties</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="dropdown">
+                                        <a href="#" id="select-layout" data-toggle="dropdown" class="dropdown-toggle">CoSE Layout <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" id="select-cose">CoSE Layout</a></li>
+                                            <li><a href="#" id="select-springy">Springy Layout</a></li>
+                                            <li><a href="#" id="select-arbor">Arbor Layout</a></li>
+                                            <li><a href="#" id="select-cola">Cola Layout</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div><!-- /.navbar-collapse -->
+                        </div>
+                    </nav>
+                </div>
+                <div id="break"></div>
+                <div id="sbgn-network-container"></div>
+                <div id="layout-properties-dialog" title="Layout Properties">
+                    <span class="ui-state-default">
+                        <span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 0 0;">
+                        </span>
+                    </span>
+                    <div style="margin-left: 23px;">
+                        <table id="cose-properties-table">
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Node Repulsion </span>
+                                </td>
+                                <td>
+                            <input id="node-repulsion-cose" type="text" />
+                            </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Node Overlap </span>
+                                </td>
+                                <td>
+                            <input id="ideal-edge-length-cose" type="text" />
+                            </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Ideal Edge Length </span>
+                                </td>
+                                <td>
+                            <input id="node-overlap-cose" type="text" />
+                            </td>
+                            </tr>
+
+
+                        </table>
+
+                        <table id="springy-properties-table">
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Repulsion </span>
+                                </td>
+                                <td>
+                            <input id="repulsion-springy" type="text" />
+                            </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Node Overlap </span>
+                                </td>
+                                <td>
+                            <input id="stiffness-springy" type="text" />
+                            </td>
+                            </tr>
+
+
+                        </table>
+
+                        <table id="arbor-properties-table">
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Gravity </span>
+                                </td>
+                                <td>
+                            <input type="checkbox" id="arbor-gravity"/>
+                            </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Infinite </span>
+                                </td>
+                                <td>
+                            <input id="arbor-infinate" type="checkbox" />
+                            </td>
+                            </tr>
+                        </table>
+
+                        <table id="cola-properties-table">
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Avoid Overlap </span>
+                                </td>
+                                <td>
+                            <input type="checkbox" id="avoid-overlap-cola"/>
+                            </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <span class="add-on layout-text"> Edge Length </span>
+                                </td>
+                                <td>
+                            <input id="edge-length-cola" type="text" />
+                            </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="add-node-dialog" title="Add Node">
+                    <span class="ui-state-default">
+                        <span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 0 0;">
+                        </span>
+                    </span>
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> Name </span>
+                            </td>
+                            <td>
+                        <input id="new-node-name" type="text" />
+                        </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> Width </span>
+                            </td>
+                            <td>
+                        <input id="new-node-width" type="text" />
+                        </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> Height </span>
+                            </td>
+                            <td>
+                        <input id="new-node-height" type="text" />
+                        </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> X </span>
+                            </td>
+                            <td>
+                        <input id="new-node-x" type="text" />
+                        </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> Y </span>
+                            </td>
+                            <td>
+                        <input id="new-node-y" type="text" />
+                        </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> Color </span>
+                            </td>
+                            <td>
+                        <input id="new-node-color" type="color" />
+                        </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <span class="add-on layout-text"> Shape </span>
+                            </td>
+                            <td>
+                                <select id="new-node-shape">
+                                    <option value="rectangle">Rectangle</option>
+                                    <option value="triangle">Triangle</option>
+                                    <option value="ellipse">Ellipse</option>
+                                    <option value="roundrectangle">Round Rectangle</option>
+                                    <option value="pentagon">Pentagon</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!--</div>-->
+                </body>
+                </html>                                		
